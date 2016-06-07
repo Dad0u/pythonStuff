@@ -50,10 +50,15 @@ class Worker:
     self.p = []
 
     def queuedF(qIn,qOut,f):
-      val = qIn.get()
-      while val is not None:
-        qOut.put(f(val))
-        val = qIn.get()
+      val = 0
+      while True:
+        try:
+          val = qIn.get(True,1)
+          if val is None:
+            break
+          qOut.put(f(val))
+        except QE:
+          pass
       
     for i in range(self.N):
       self.p.append(Process(target=queuedF,args=(self.qIn,self.qOut,self.f)))

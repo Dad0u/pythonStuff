@@ -1,21 +1,22 @@
 #coding: utf-8
 from __future__ import print_function,division
 
-import time
 import matplotlib.pyplot as plt
 #import numpy as np
+
 
 class FakeMotor(object):
     def __init__(self,**kwargs):
         self.inertia = kwargs.get("inertia",400)
-        self.torque = kwargs.get("torque",0) # A negative torque applied on the motor
-        self.kv = kwargs.get("kv",1000) #rpm/V
+        # A negative torque applied on the motor
+        self.torque = kwargs.get("torque",0)
+        self.kv = kwargs.get("kv",1000) # rpm/V
         self.rv = kwargs.get("rv",.4) # solid friction
         self.fv = kwargs.get("fv",2e-5) # fluid friction
         self.rpm = 0
         self.pos = 0
         self.u = 0 # V
-        
+
     def update(self,t=1):
         """
         Will update the motor rpm after t ms
@@ -25,17 +26,18 @@ class FakeMotor(object):
         drpm = F/self.inertia*t
         self.pos += t*(self.rpm+drpm/2)
         self.rpm += drpm
-        
+
     def set_u(self,u):
         self.u = u
 
-        
+
 class PID(object):
     def __init__(self,P,I,D,**kwargs):
         self.global_limit = kwargs.get("global_limit",True)
         self.out_min = kwargs.get("min",-10)
         self.out_max = kwargs.get("max",10)
-        #This will make sure the actual output will not be between out_min and out_max
+        #This will make sure the actual output
+        #will always be between out_min and out_max
         # Because each influence (P,I and D) will be limited independantly
         if not self.global_limit:
             self.out_max /= 3
@@ -44,11 +46,10 @@ class PID(object):
         self.I = I
         self.D = D
         self.out = 0
-        self.nI = kwargs.get("ni",50) #Number of dots to compute intergal
+        self.nI = kwargs.get("ni",50) # Number of dots to compute intergal
         self.nD = kwargs.get("nd",6) # ...derivative
         self.hist = []
-        
-        
+
     def update(self,target,out_value):
         diff = target-out_value
         if len(self.hist) < max(self.nI,self.nD):
@@ -63,20 +64,20 @@ class PID(object):
 
     def limit(self,val):
         return max(min(self.out_max,val),self.out_min)
-        
+
     def getP(self,target,out_value):
         if self.global_limit:
             return self.P*(target-out_value)
         else:
             return self.limit(self.P*(target-out_value))
-        
+
     def getI(self,target,out_value):
         val = self.I*sum(self.hist[-self.nI:])/len(self.hist[-self.nI:])
         if self.global_limit:
             return val
         else:
             return self.limit(val)
-            
+
     def getD(self,target,out_value):
         assert self.nD%2 == 0,"nD must be even!"
         if len(self.hist) < self.nD:
@@ -89,14 +90,15 @@ class PID(object):
             return val
         else:
             return self.limit(val)
-        
+
     def get_cmd(self,target,out_value):
         self.update(target,out_value)
         if self.global_limit:
             return self.limit(self.out)
         else:
             return self.out
-        
+
+
 m = FakeMotor(torque=500)
 pid = PID(.05,.07,.283,min=-20,max=20,global_limit=True,ni=20)
 target = 10000
@@ -109,8 +111,8 @@ td = []
 pos = []
 
 for i in range(5000):
-    
-    if i <= -2000: #Ramp
+
+    if i <= -2000: # Ramp
         target = i
     if i == 2000: # Step
         target = 5000
@@ -124,7 +126,7 @@ for i in range(5000):
     curr_pos = m.pos
     curr_cmd = pid.get_cmd(target,curr_rpm)
     #curr_cmd = pid.get_cmd(target,curr_pos)
-    
+
     m.set_u(curr_cmd)
     m.update()
     t.append(i)

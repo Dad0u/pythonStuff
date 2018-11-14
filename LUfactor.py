@@ -2,14 +2,17 @@
 from __future__ import print_function,division
 
 import numpy as np
-import scipy.linalg as lalg
 
 """
-A program to understand system resolution by LU factorization. It does not permute anything, so it cannot solve every solvable system, it is only for understanding (and it is waaay slower than numpy)
+A program to understand system resolution by LU factorization.
+It does not permute anything, so it cannot solve every solvable
+system, it is only for understanding
+(and it is waaay slower than numpy)
 """
 
 
-#Takes a matrix M, decomposes it in a product LU of a lower triangular matrix and an upper triangular matrix
+# Takes a matrix M, decomposes it in a product LU of a
+# lower triangular matrix and an upper triangular matrix
 def LU(M):
   L = np.identity(size)
   U = M
@@ -21,9 +24,10 @@ def LU(M):
 
   return L,U
 
+
 # Given the LU decomposition of a matrix, solves (LU)x=b
 def LUsolve(L,U,b):
-#Solving Lp = b
+  #Solving Lp = b
   p = np.zeros(size)
   for k in range(size):
     r = sum([L[i,k]*p[i] for i in range(k)])
@@ -36,13 +40,14 @@ def LUsolve(L,U,b):
     x[k] = (p[k]-r)/U[k,k]
   return x
 
+
 def solve(M,b):
   L,U = LU(M)
   return LUsolve(L,U,b)
 
 
 if __name__ == "__main__":
-  size = 50
+  size = 500
   M = np.random.rand(size,size)
   print("M:\n",M,"\n\n")
   b = np.random.rand(size)

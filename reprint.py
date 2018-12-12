@@ -4,6 +4,8 @@ from __future__ import print_function
 import sys
 
 last_len = None
+
+
 def reprint(*args):
   global last_len
   s = " ".join([str(i) for i in args])
@@ -14,6 +16,7 @@ def reprint(*args):
     sys.stdout.write("\033[F")
   last_len = l
   print(s)
+
 
 if __name__ == "__main__":
   from time import sleep

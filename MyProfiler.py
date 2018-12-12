@@ -3,11 +3,16 @@
 from __future__ import print_function,division
 from time import time
 
+
 class SerialProfiler:
   """
-  A VERY basic profiler using time.time() to query the elapsed time during different stages of a serialized task.
-  Does NOT support pausing/restarting or parallel timings on a single instance (self.start() automatically stops the previous step, hence the "serial" profiler)
-  Note: it is not meant to be very accurate (time.time() is not precise, especially on Dos systems)
+  A VERY basic profiler using time.time() to query the elapsed
+  time during different stages of a serialized task.
+  Does NOT support pausing/restarting or parallel timings on a
+  single instance (self.start() automatically stops the previous step,
+  hence the "serial" profiler)
+  Note: it is not meant to be very accurate
+  (time.time() is not precise, especially on Dos systems)
   """
   def __init__(self,name='0'):
     self.tab = [dict(name=name.decode('utf-8'),start=time(),stop=None)]
@@ -25,7 +30,8 @@ class SerialProfiler:
 
   def results(self):
     self.stop()
-    #total = (self.tab[-1]['stop']-self.tab[0]['start'])*1000 # Counts time even when no profiler is running
+    # total = (self.tab[-1]['stop']-self.tab[0]['start'])*1000
+    # Counts time even when no profiler is running
     total = 1000*sum([t['stop']-t['start'] for t in self.tab])
     for i in range(len(self.tab)):
       t = 1000*(self.tab[i]['stop']-self.tab[i]['start'])
@@ -33,6 +39,7 @@ class SerialProfiler:
       pad = (32-len(self.tab[i]['name']))*'.'+': '
       print(self.tab[i]['name']+pad+str(round(t,3))+" ms ("+str(percent),"%)")
     print("\nTOTAL : "+24*'.'+':',total,"ms.")
+
 
 class Profile:
   """
@@ -55,26 +62,33 @@ class Profile:
     self.running = False
     self.total += t-self.t0
 
+
 class ParallelProfiler:
   """
-  A VERY basic profiler using time.time() to query the elapsed time during different stages of a serialized task.
-  This version supports pause/restart and parallel timing but may be slightly slower the the serial version
-  Note: it is not meant to be very accurate (time.time() is not precise, especially on Dos systems)
+  A VERY basic profiler using time.time() to query the
+  elapsed time during different stages of a serialized task.
+  This version supports pause/restart and parallel timing
+  but may be slightly slower the the serial version
+  Note: it is not meant to be very accurate
+  (time.time() is not precise, especially on Dos systems)
   """
   def __init__(self):
     self.dic = dict() # Dict to store id of Profiles by name
-    self.tab = [] # list to store the profiles (not using directly the dict because it is not ordered)
+    self.tab = [] # list to store the profiles
+    # not using directly the dict because it is not ordered
     self.n = 0
     self.last = None
 
   def start(self,name='unnamed',stopLast=False):
-    #if StopLast == True, starting this timer will pause the previous one (useful for timing each part of a loop without stopping every timer before starting the next one)
+    #if StopLast == True, starting this timer will pause the previous one
+    # (useful for timing each part of a loop
+    # without stopping every timer before starting the next one)
     if stopLast:
       t=time()
       name = name.decode('utf-8')
       try:
         self.tab[self.last].stop(t)
-      except TypeError: #If self.last=None
+      except TypeError: # If self.last=None
         pass
     try:
       uid = self.dic[name]
@@ -105,6 +119,7 @@ class ParallelProfiler:
       if val == uid:
         return key
 
+
 #Example of usage for Parallel
 if __name__ == '__main__':
   from time import sleep
@@ -113,9 +128,10 @@ if __name__ == '__main__':
   for i in range(10):
     prof.start("Sleeping .12 seconds")
     sleep(.12)
-    prof.start("Looping on 1000000 elements",True) # Stops "Sleeping .12 seconds"
+    prof.start("Looping on 1000000 elements",True)
+    # Stops "Sleeping .12 seconds"
     a = 0
-    for i in xrange(1000000):
+    for i in range(1000000):
       a+=i
     prof.stop("Looping on 1000000 elements")
     #Doing unprofiled stuff
@@ -124,17 +140,20 @@ if __name__ == '__main__':
     for i in range(100000):
       a = 'YoLOoLolooLoLLO'.lower()
     prof.stop("Lowering a string 100000 times")
-  prof.results() # Automatically stops all running timers (here it stops "Whole loop")
+  prof.results()
+  # Automatically stops all running timers (here it stops "Whole loop")
 
   print("\n############\n")
 
-#Example of usage for Serial
-  prof = SerialProfiler("Sleeping .12 seconds") # The profiler starts when instanciated, so it can take the name of the 1st task as argument
+  #Example of usage for Serial
+  prof = SerialProfiler("Sleeping .12 seconds")
+  # The profiler starts when instanciated,
+  # so it can take the name of the 1st task as argument
   #prof.start("Sleeping .12 seconds")
   sleep(.12)
   prof.start("Looping on 1000000 elements")
   a = 0
-  for i in xrange(1000000):
+  for i in range(1000000):
     a+=i
   prof.stop()
   #Doing unprofiled stuff

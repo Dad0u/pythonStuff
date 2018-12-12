@@ -1,6 +1,7 @@
 #coding: utf-8
 from __future__ import print_function
 
+
 def listify(f):
   """
   Decorator to allow a function to take its args as a list
@@ -15,6 +16,7 @@ def listify(f):
       return r
     return f(*args,**kwargs)
   return new_f
+
 
 if __name__ == "__main__":
   @listify

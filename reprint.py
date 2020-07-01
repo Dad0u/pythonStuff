@@ -1,8 +1,5 @@
 #coding: utf-8
 
-from __future__ import print_function
-import sys
-
 last_len = None
 
 
@@ -13,9 +10,8 @@ def reprint(*args):
   l = len(s)
   if last_len is not None:
     s+=" "*(last_len-l)
-    sys.stdout.write("\033[F")
   last_len = l
-  print(s)
+  print(s,end='\r',flush=True)
 
 
 if __name__ == "__main__":
@@ -23,3 +19,4 @@ if __name__ == "__main__":
   for i in range(10):
     sleep(.2)
     reprint(i,"X"*(1+i%3))
+  print("\n")

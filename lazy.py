@@ -11,29 +11,27 @@ def lazyproperty(f):
   return wrapper
 
 
-def mysum(l): # Example function to be called in my test getter
-  print("Summing...")
-  return sum(l)
+if __name__ == '__main__':
+  def mysum(l): # Example function to be called in my test getter
+    print("Summing...")
+    return sum(l)
 
+  class Stuff():
+    def __init__(self,data=[0,1,2]):
+      self.data = data
 
-class Stuff():
-  def __init__(self,data=[0,1,2]):
-    self.data = data
+    # s.sum will be computed on the first time we get it
+    # but the same value will be returned on every other call
+    # Simply delete self._sum to mark it as to be computed again
+    @lazyproperty
+    def sum(self):
+      return mysum(self.data)
 
-  # s.sum will be computed on the first time we get it
-  # but the same value will be returned on every other call
-  # Simply delete self._sum to mark it as to be computed again
-  @lazyproperty
-  def sum(self):
-    return mysum(self.data)
-
-
-s = Stuff()
-
-print("First call:")
-print("sum=",s.sum)
-print("second call:")
-print("sum=",s.sum)
-del s._sum
-print("Third call:")
-print("sum=",s.sum)
+  s = Stuff()
+  print("First call:")
+  print("sum=",s.sum)
+  print("second call:")
+  print("sum=",s.sum)
+  del s._sum
+  print("Third call:")
+  print("sum=",s.sum)

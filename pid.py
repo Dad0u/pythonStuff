@@ -1,34 +1,5 @@
 #coding: utf-8
-from __future__ import print_function,division
-
 import matplotlib.pyplot as plt
-#import numpy as np
-
-
-class FakeMotor(object):
-    def __init__(self,**kwargs):
-        self.inertia = kwargs.get("inertia",400)
-        # A negative torque applied on the motor
-        self.torque = kwargs.get("torque",0)
-        self.kv = kwargs.get("kv",1000) # rpm/V
-        self.rv = kwargs.get("rv",.4) # solid friction
-        self.fv = kwargs.get("fv",2e-5) # fluid friction
-        self.rpm = 0
-        self.pos = 0
-        self.u = 0 # V
-
-    def update(self,t=1):
-        """
-        Will update the motor rpm after t ms
-        Supposes u is constant for the interval t
-        """
-        F = self.u*self.kv-self.torque-self.rpm*(1+self.rv+self.rpm*self.fv)
-        drpm = F/self.inertia*t
-        self.pos += t*(self.rpm+drpm/2)
-        self.rpm += drpm
-
-    def set_u(self,u):
-        self.u = u
 
 
 class PID(object):
@@ -99,50 +70,79 @@ class PID(object):
             return self.out
 
 
-m = FakeMotor(torque=500)
-pid = PID(.05,.07,.283,min=-20,max=20,global_limit=True,ni=20)
-target = 10000
-t = []
-rpm = []
-cmd = []
-tp = []
-ti = []
-td = []
-pos = []
+if __name__ == '__main__':
+  """
+  Testing with a fake motor
+  """
+  class FakeMotor(object):
+      def __init__(self,**kwargs):
+          self.inertia = kwargs.get("inertia",400)
+          # A negative torque applied on the motor
+          self.torque = kwargs.get("torque",0)
+          self.kv = kwargs.get("kv",1000) # rpm/V
+          self.rv = kwargs.get("rv",.4) # solid friction
+          self.fv = kwargs.get("fv",2e-5) # fluid friction
+          self.rpm = 0
+          self.pos = 0
+          self.u = 0 # V
 
-for i in range(5000):
+      def update(self,t=1):
+          """
+          Will update the motor rpm after t ms
+          Supposes u is constant for the interval t
+          """
+          F = self.u*self.kv-self.torque-self.rpm*(1+self.rv+self.rpm*self.fv)
+          drpm = F/self.inertia*t
+          self.pos += t*(self.rpm+drpm/2)
+          self.rpm += drpm
 
-    if i <= -2000: # Ramp
-        target = i
-    if i == 2000: # Step
-        target = 5000
-    if i == 3000: # Torque step
-        m.torque = 3500 # Change the counter torque on the motor
-    if i == 4000: # Cut everything
-        m.torque = 0
-        pid = PID(0,0,0)
+      def set_u(self,u):
+          self.u = u
 
-    curr_rpm = m.rpm
-    curr_pos = m.pos
-    curr_cmd = pid.get_cmd(target,curr_rpm)
-    #curr_cmd = pid.get_cmd(target,curr_pos)
+  m = FakeMotor(torque=500)
+  pid = PID(.05,.07,.283,min=-20,max=20,global_limit=True,ni=20)
+  target = 10000
+  t = []
+  rpm = []
+  cmd = []
+  tp = []
+  ti = []
+  td = []
+  pos = []
 
-    m.set_u(curr_cmd)
-    m.update()
-    t.append(i)
-    rpm.append(curr_rpm)
-    pos.append(curr_pos)
-    cmd.append(200*curr_cmd)
-    tp.append(pid.getP(target,curr_rpm))
-    ti.append(pid.getI(target,curr_rpm))
-    td.append(pid.getD(target,curr_rpm))
+  for i in range(5000):
 
-#plt.plot(t,pos)
-plt.plot(t,rpm)
-plt.plot(t,cmd)
-#plt.plot(t,t)
-plt.show()
-plt.plot(t,tp)
-plt.plot(t,ti)
-plt.plot(t,td)
-plt.show()
+      if i <= -2000: # Ramp
+          target = i
+      if i == 2000: # Step
+          target = 5000
+      if i == 3000: # Torque step
+          m.torque = 3500 # Change the counter torque on the motor
+      if i == 4000: # Cut everything
+          m.torque = 0
+          pid = PID(0,0,0)
+
+      curr_rpm = m.rpm
+      curr_pos = m.pos
+      curr_cmd = pid.get_cmd(target,curr_rpm)
+      #curr_cmd = pid.get_cmd(target,curr_pos)
+
+      m.set_u(curr_cmd)
+      m.update()
+      t.append(i)
+      rpm.append(curr_rpm)
+      pos.append(curr_pos)
+      cmd.append(200*curr_cmd)
+      tp.append(pid.getP(target,curr_rpm))
+      ti.append(pid.getI(target,curr_rpm))
+      td.append(pid.getD(target,curr_rpm))
+
+  #plt.plot(t,pos)
+  plt.plot(t,rpm)
+  plt.plot(t,cmd)
+  #plt.plot(t,t)
+  plt.subplots()
+  plt.plot(t,tp)
+  plt.plot(t,ti)
+  plt.plot(t,td)
+  plt.show()

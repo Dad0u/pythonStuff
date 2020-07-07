@@ -14,9 +14,12 @@ def cachedfunc(savefile):
       except FileNotFoundError:
         saved = {}
       if arg not in saved:
+        print(f"[cachedfunc] {f.__name__}({arg}) not found, adding...")
         saved[arg] = f(arg)
         with open(savefile,'wb') as sf:
           pickle.dump(saved,sf)
+      else:
+        print(f"[cachedfunc] Using cached value for {f.__name__}({arg})")
       return saved[arg]
     return newf
   return deco

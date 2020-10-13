@@ -1,8 +1,6 @@
 #coding: utf-8
-from __future__ import print_function
-
 from multiprocessing import Process,Queue
-from Queue import Empty as QE
+from queue import Empty as QE
 from threading import Thread
 
 

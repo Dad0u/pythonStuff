@@ -5,9 +5,11 @@ from multiprocessing import Process,Queue
 from Queue import Empty as QE
 from threading import Thread
 
+
 class QueueClearer(Thread):
   """
-  Class to empty the worker queue and store it in a list (queues can lock the program when full)
+  Class to empty the worker queue and store it in a list
+  (queues can lock the program when full)
   Allows to get the return values on demand
   """
   def __init__(self, q):
@@ -33,13 +35,15 @@ class QueueClearer(Thread):
 
   def stop(self):
     self.go = False
-    
 
 
 class Worker:
   """
-    This class creates multiple processes to execute of fonction asynchronously on large ammount of data. Once started, it waits for data (given with feed(data)), executes the fonction and stores the return value. It can then be recovered with .getRes()
-    /!\ For now, order is not necessarily respected in the output !
+    This class creates multiple processes to execute of fonction
+    asynchronously on large ammount of data. Once started,
+    it waits for data (given with feed(data)), executes the fonction
+    and stores the return value. It can then be recovered with .getRes()
+    /!\\ For now, order is not necessarily respected in the output !
   """
   def __init__(self,**kwargs):
     self.reslist = []
@@ -59,7 +63,7 @@ class Worker:
           qOut.put(f(val))
         except QE:
           pass
-      
+
     for i in range(self.N):
       self.p.append(Process(target=queuedF,args=(self.qIn,self.qOut,self.f)))
 
@@ -86,7 +90,6 @@ class Worker:
 
   def getRes(self):
     return self.qc.getList()
-    
 
 
 # ============= Example ============
@@ -104,11 +107,11 @@ if __name__ == "__main__":
       arr /= 1.5
     return arr+148
 
-
   w = Worker(target=doStuff)
 
   for i in range(500):
-    w.feed(np.random.random((100,100))) # It is possible to "pre-feed" before starting
+   # It is possible to "pre-feed" before starting
+    w.feed(np.random.random((100,100)))
 
   w.start()
 

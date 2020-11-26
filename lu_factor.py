@@ -14,20 +14,20 @@ system, it is only for understanding
 # Takes a matrix M, decomposes it in a product LU of a
 # lower triangular matrix and an upper triangular matrix
 def LU(M):
+  size = M.shape[0]
   L = np.identity(size)
   U = M
-
   for i in range(size):
     for j in range(i+1,size):
       L[j,i] = M[j,i]/M[i,i]
       U[j] = M[j]-L[j,i]*U[i]
-
   return L,U
 
 
 # Given the LU decomposition of a matrix, solves (LU)x=b
 def LUsolve(L,U,b):
   #Solving Lp = b
+  size = len(b)
   p = np.zeros(size)
   for k in range(size):
     r = sum([L[i,k]*p[i] for i in range(k)])

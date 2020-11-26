@@ -100,9 +100,10 @@ if __name__ == '__main__':
           self.u = u
 
   m = FakeMotor(torque=500)
-  pid = PID(.05,.07,.283,min=-20,max=20,global_limit=True,ni=20)
+  pid = PID(.1,.07,.283,min=-20,max=20,global_limit=True,ni=10)
   target = 10000
   t = []
+  tar = []
   rpm = []
   cmd = []
   tp = []
@@ -112,7 +113,7 @@ if __name__ == '__main__':
 
   for i in range(5000):
 
-      if i <= -2000: # Ramp
+      if i <= 2000: # Ramp
           target = i
       if i == 2000: # Step
           target = 5000
@@ -130,6 +131,7 @@ if __name__ == '__main__':
       m.set_u(curr_cmd)
       m.update()
       t.append(i)
+      tar.append(target)
       rpm.append(curr_rpm)
       pos.append(curr_pos)
       cmd.append(200*curr_cmd)
@@ -140,6 +142,7 @@ if __name__ == '__main__':
   #plt.plot(t,pos)
   plt.plot(t,rpm)
   plt.plot(t,cmd)
+  plt.plot(t,tar)
   #plt.plot(t,t)
   plt.subplots()
   plt.plot(t,tp)

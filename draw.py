@@ -8,7 +8,7 @@ def circle(a,coord,r,value=1):
     if y < 0 or y >= h:
       continue
     l = (r*r-(cy-y)**2)**.5
-    img[y,max(0,int(np.round(cx-l))):min(w,int(np.round(cx+l)))] = value
+    a[y,max(0,int(np.round(cx-l))):min(w,int(np.round(cx+l)))] = value
 
 
 if __name__ == '__main__':

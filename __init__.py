@@ -1,4 +1,4 @@
-from .base64 import toBase64,bytesFromBase64
+from .my_base64 import toBase64,bytesFromBase64
 from .cachedfunc import cachedfunc
 from .lazy import lazyproperty
 from .listify import listify
